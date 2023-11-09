@@ -5,6 +5,10 @@
 *.pkl
 *.jar
 !examples/contextPrefixSpan.txt
+!tests/test_files/*
+
+# vscode
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -105,3 +109,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# notebooks
+notebooks/*
