@@ -20,8 +20,7 @@ class Spmf(ABC):
 
         :param memory:
         """
-        self.executable_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'spmf.jar')
-        # self.executable_path = Path('../binaries/spmf.jar')
+        self.executable_path = 'binaries\\spmf.jar'
         self.output_file_name = output_file_name
         self.memory = memory
     
@@ -64,7 +63,7 @@ class Spmf(ABC):
         """
         
         self.run(input_file_name)        
-        return self._parse_output_file()
+        return self._parse_output_file(delete=True)
     
     def run(self, input_file_name: Text) -> None:
         """ Run SPMF Algorithm """
