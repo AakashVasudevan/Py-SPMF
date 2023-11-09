@@ -7,6 +7,9 @@
 !examples/contextPrefixSpan.txt
 !tests/test_files/*
 
+# vscode
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
