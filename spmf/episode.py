@@ -61,10 +61,54 @@ class Episode(Spmf):
         return super().run_pandas(input_df)
 
     def run_file(self, input_file_name: Text) -> Tuple[List[Text], List[int]]:
-        """ Run TKE algorithm on an input txt file
+        """ Run Episode Mining algorithm on an input txt file
 
         :param input_file_name: Input txt file name
         :return: Tuple of frequent episode patterns and corresponding support
+        """
+        return super().run_file(input_file_name)
+
+
+class EpisodeRules(Episode):
+    """ Base class for Episode Rule Mining """
+
+    def _parse_output_file(self, **kwargs) -> Tuple[List[Text], List[int], List[float]]:
+        """ Parse output txt file created by the Episode Rule Mining algorithm
+
+        :param kwargs: keyword arguments to read output file (delete)
+        :return: Tuple of patterns and corresponding support and confidence
+        """
+        lines = self._read_output_file(**kwargs)
+        patterns, supports, confidence = [], [], []
+        for line in lines:
+            line = line.strip().split('#')
+            patterns.append(line[0].strip())
+            supports.append(re.search(r'(\d+)$', line[1].strip()).group(0))
+            confidence.append(re.search(r'([\d.]+)$', line[2].strip()).group(0))
+
+        return patterns, list(map(int, supports)), list(map(float, confidence))
+
+    def _create_output_dataframe(self, patterns: List[Text], supports: List[int], confidence: List[float]) -> pd.DataFrame:
+        """ Create Output Dataframe
+
+        :return: Dataframe containing patterns and corresponding support and confidence
+        """
+        return pd.DataFrame((patterns, supports, confidence), index=['Frequent episode', 'Support', 'Confidence']).T
+
+    def run_pandas(self, input_df: pd.DataFrame) -> pd.DataFrame:
+        """ Run Episode Mining algorithm on Pandas Dataframe
+
+        :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
+            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+        :return: Dataframe containing the frequent episodes and support.
+        """
+        return super().run_pandas(input_df)
+
+    def run_file(self, input_file_name: Text) -> Tuple[List[Text], List[int], List[float]]:
+        """ Run Episode Mining algorithm on an input txt file
+
+        :param input_file_name: Input txt file name
+        :return: Tuple of frequent episode patterns and corresponding support and confidence
         """
         return super().run_file(input_file_name)
 
@@ -106,6 +150,52 @@ class TKE(Episode):
         return list(arguments.values())
 
 
+class TKERules(EpisodeRules):
+    """ Episode Rule Mining using TKE """
+
+    def __init__(self, k: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, min_support: int = 2, **kwargs) -> None:
+        """ Initialize Object
+
+        :param k:
+        :param max_window:
+        :param timestamp_present:
+        :param min_confidence:
+        :param max_consequent_count:
+        :param min_support:
+        :param kwargs:
+        """
+        super().__init__(**kwargs)
+
+        self.k = k
+        self.max_window = max_window
+        self.timestamp_present = timestamp_present
+        self.min_confidence = min_confidence
+        self.max_consequent_count = max_consequent_count
+        self.min_support = min_support
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'TKE-Rules',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'K': str(self.k),
+            'max_window': str(self.max_window),
+            'Timestamp': str(not self.timestamp_present),
+            'min_confidence': str(self.min_confidence),
+            'max_consequent_event': str(self.max_consequent_count),
+            'min_support': str(self.min_support)
+        }
+
+        return list(arguments.values())
+
+
 class EMMA(Episode):
     """ Frequent Episode Mining using EMMA """
 
@@ -135,9 +225,50 @@ class EMMA(Episode):
             'Algorithm': 'EMMA',
             'Input': input_file_name,
             'Output': self.output_file_name,
-            'Min_Support': str(self.min_support),
+            'min_support': str(self.min_support),
             'max_window': str(self.max_window),
             'Timestamp': str(not self.timestamp_present)
+        }
+
+        return list(arguments.values())
+
+
+class EMMARules(EpisodeRules):
+    """ Frequent Episode Mining using EMMA """
+
+    def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, **kwargs) -> None:
+        """ Initialize Object
+
+        :param min_support:
+        :param max_window:
+        :param timestamp_present:
+        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        """
+        super().__init__(**kwargs)
+
+        self.min_support = min_support
+        self.max_window = max_window
+        self.timestamp_present = timestamp_present
+        self.min_confidence = min_confidence
+        self.max_consequent_count = max_consequent_count
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'EMMA-Rules',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support),
+            'max_window': str(self.max_window),
+            'Timestamp': str(not self.timestamp_present),
+            'min_confidence': str(self.min_confidence),
+            'max_consequent_event': str(self.max_consequent_count),
         }
 
         return list(arguments.values())
