@@ -275,7 +275,7 @@ class EMMARules(EpisodeRules):
 
 
 class AFEM(Episode):
-    """ Frequent Episode Mining using EMMA """
+    """ Frequent Episode Mining using AFEM """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
         """ Initialize Object
@@ -306,6 +306,79 @@ class AFEM(Episode):
             'Min_Support': str(self.min_support),
             'max_window': str(self.max_window),
             'Timestamp': str(not self.timestamp_present)
+        }
+
+        return list(arguments.values())
+
+
+class MaxFEM(Episode):
+    """ Frequent Episode Mining using MaxFEM """
+
+    def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
+        """ Initialize Object
+
+        :param min_support:
+        :param max_window:
+        :param timestamp_present:
+        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        """
+        super().__init__(**kwargs)
+
+        self.min_support = min_support
+        self.max_window = max_window
+        self.timestamp_present = timestamp_present
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'MaxFEM',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'Min_Support': str(self.min_support),
+            'max_window': str(self.max_window),
+            'Timestamp': str(not self.timestamp_present)
+        }
+
+        return list(arguments.values())
+
+
+class NONEPI(EpisodeRules):
+    """ Frequent Episode Mining using NONEPI """
+
+    def __init__(self, min_support: int, min_confidence: float = 0.5, **kwargs) -> None:
+        """ Initialize Object
+
+        :param min_support:
+        :param max_window:
+        :param timestamp_present:
+        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        """
+        super().__init__(**kwargs)
+
+        self.min_support = min_support
+        self.min_confidence = min_confidence
+        self.timestamp_present = True   # Requires timestamps
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'NONEPI',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support),
+            'min_confidence': str(self.min_confidence),
         }
 
         return list(arguments.values())
