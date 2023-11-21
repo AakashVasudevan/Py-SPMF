@@ -70,7 +70,11 @@ class Spmf(ABC):
         """ Run SPMF Algorithm """
 
         process_arguments = self._create_subprocess_arguments(input_file_name)
-        process = subprocess.check_output(process_arguments)
+
+        try:
+            process = subprocess.check_output(process_arguments)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
         if 'java.lang.IllegalArgumentException' in process.decode():
             raise TypeError('java.lang.IllegalArgumentException')
