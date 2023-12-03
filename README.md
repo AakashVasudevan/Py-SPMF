@@ -1,27 +1,20 @@
-# spmf-py
-Python Wrapper for SPMF 🐍 🎁
+# Py-SPMF
+Python Wrapper for [SPMF Java library](http://www.philippe-fournier-viger.com/spmf).
 
 ## Information
-The [SPMF](http://www.philippe-fournier-viger.com/spmf) [[1](https://github.com/LoLei/spmf-py#bibliography)] data mining Java library usable in Python.  
+This module contains python wrappers for pattern mining algorithms implemented in SPMF Java library. Each algorithm is implemented as a standalone Python class with fully descriptive and tested APIs. It also provides native support for Pandas dataframes.
 
-Essentially, this module calls the Java command line tool of SPMF, passes the user arguments to it, and parses the output.  
-In addition, transformation of the data to Pandas DataFrame and CSV is possible.
-
-In theory, all algorithms featured in SPMF are callable. Nothing is hardcoded, the desired algorithm and its parameters need to be perused in the [SPMF documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).
 
 ## Installation
 [`pip install spmf`](https://pypi.org/project/spmf/)
 
 ## Usage
-Example:  
+Example:
 ```python
-from spmf import Spmf
+from spmf.episode import EMMA
 
-spmf = Spmf("PrefixSpan", input_filename="contextPrefixSpan.txt",
-            output_filename="output.txt", arguments=[0.7, 5])
-spmf.run()
-print(spmf.to_pandas_dataframe(pickle=True))
-spmf.to_csv("output.csv")
+emma = EMMA(min_support=2, max_window=2, timestamp_present=True)
+output = emma.run_pandas(input_df)
 ```
 
 Output:
@@ -51,15 +44,15 @@ Output:
 13        [6]   3
 ```
 
-The usage is similar to the one described in the SPMF [documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).  
-For all Python parameters, see the [Spmf class](https://github.com/LoLei/spmf-py/blob/master/spmf/__init__.py).  
+The usage is similar to the one described in the SPMF [documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).
+For all Python parameters, see the [Spmf class](https://github.com/LoLei/spmf-py/blob/master/spmf/__init__.py).
 
 ### SPMF Arguments
-The `arguments` parameter are the arguments that are passed to SPMF and depend on the chosen algorithm. SPMF handles optional parameters as an ordered list. As there are no named parameters for the algorithms, if e.g. only the first and the last parameter of an algorithm are to be used, the ones in between must be filled with `""` blank strings.  
+The `arguments` parameter are the arguments that are passed to SPMF and depend on the chosen algorithm. SPMF handles optional parameters as an ordered list. As there are no named parameters for the algorithms, if e.g. only the first and the last parameter of an algorithm are to be used, the ones in between must be filled with `""` blank strings.
 For advanced usage examples, see [`examples`](https://github.com/LoLei/spmf-py/tree/master/examples).
 
 ### SPMF Executable
-Download it from the [SPMF Website](http://www.philippe-fournier-viger.com/spmf/index.php?link=download.php).  
+Download it from the [SPMF Website](http://www.philippe-fournier-viger.com/spmf/index.php?link=download.php).
 It is assumed that the SPMF binary `spmf.jar` is located in the same directory as `spmf-py`. If it is not, either symlink it, or use the `spmf_bin_location_dir` parameter.
 
 ### Input Formats
@@ -73,10 +66,32 @@ where `n` is megabyte, see SPMF's
 ## Background
 Why? If you're in a Python pipeline, like a Jupyter Notebook, it might be cumbersome to use Java as an intermediate step. Using `spmf-py` you can stay in your pipeline as though Java is never used at all.
 
+## Implementation
+
+### Episode Mining
+
+- algorithms for mining frequent episodes
+
+      The EMMA algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Kuo-Yu et al., 2008)
+
+      The AFEM algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Fournier-Viger et al., 2022 )
+
+      The MINEPI+ algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Kuo-Yu et al., 2008)
+
+      The MINEPI algorithm, which finds the frequent episodes, counts the support based on minimal occurrences, and does not allow simultaneous events (Mannila & Toivonen, 1997)
+
+- algorithms for mining the top-k frequent episodes
+
+      The TKE algorithm, which finds the top-k most frequent episodes based on the head frequency (Fournier-Viger et al., 2020)
+
+algorithms for mining maximal frequent episodes
+the MaxFEM algorithm, which finds the maximal frequent episodes, and counts the support based on th
+
+
 ## Bibliography
 ```
-Fournier-Viger, P., Lin, C.W., Gomariz, A., Gueniche, T., Soltani, A., Deng, Z., Lam, H. T. (2016).  
-The SPMF Open-Source Data Mining Library Version 2.  
+Fournier-Viger, P., Lin, C.W., Gomariz, A., Gueniche, T., Soltani, A., Deng, Z., Lam, H. T. (2016).
+The SPMF Open-Source Data Mining Library Version 2.
 Proc. 19th European Conference on Principles of Data Mining and Knowledge Discovery (PKDD 2016) Part III, Springer LNCS 9853,  pp. 36-40.
 ```
 

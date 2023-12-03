@@ -1,9 +1,8 @@
-# SPMF input and output files, jar itself
+# SPMF input and output files
 *.txt
 *.text
 *.csv
 *.pkl
-*.jar
 !examples/contextPrefixSpan.txt
 !tests/test_files/*
 
@@ -35,6 +34,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.DS_Store
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
