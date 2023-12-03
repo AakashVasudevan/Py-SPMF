@@ -11,6 +11,30 @@ from spmf.base import Spmf
 class Episode(Spmf):
     """ Base class for Episode Mining """
 
+    def _transform_input_dataframe(self, input_df: pd.DataFrame) -> pd.DataFrame:
+        """ Transform input dataframe to the format required by SPMF
+
+        :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
+            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+        :return: Transformed dataframe
+        """
+
+        df = input_df.copy()
+
+        if not self.timestamp_present:
+            df = df.reset_index(names='Time points')
+            self.timestamp_present = True       # override timestamp parameter
+
+        if not self.transform:
+            self.mapping = str.maketrans(dict())
+            return df
+
+        df['Items'] = (input_df.groupby('Itemset').ngroup()+1).astype(str)
+        self.mapping = str.maketrans(df.set_index('Items', drop=True).to_dict()['Itemset'])
+
+        df = df.groupby('Time points').agg((' ').join).reset_index()
+        return df.rename({'Items': 'Itemset', 'Itemset': 'Items'}, axis=1)
+
     def _parse_input_dataframe(self, input_df: pd.DataFrame) -> Text:
         """ Parse Input Dataframe to string format required for Episode Mining
 
@@ -18,14 +42,8 @@ class Episode(Spmf):
             NOTE: If Timestamp present, dataframe should contain it 'Time points' column
         :return: Parsed String representation
         """
-        df = input_df.copy()
-
-        if self.timestamp_present:
-            df['input'] = df.apply(lambda x: '|'.join([x['Itemset'], str(x['Time points'])]), axis=1)
-
-        else:
-            df['input'] = df['Itemset']
-
+        df = self._transform_input_dataframe(input_df)
+        df['input'] = df.apply(lambda x: '|'.join([x['Itemset'], str(x['Time points'])]), axis=1)
         return ('\n').join(df['input'].to_list())
 
     def _parse_output_file(self, **kwargs) -> Tuple[List[Text], List[int]]:
@@ -49,7 +67,8 @@ class Episode(Spmf):
 
         :return: Dataframe containing patterns and corresponding support
         """
-        return pd.DataFrame((patterns, supports), index=['Frequent episode', 'Support']).T
+        patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
+        return pd.DataFrame((patterns_mapped, supports), index=['Frequent episode', 'Support']).T
 
     def run_pandas(self, input_df: pd.DataFrame) -> pd.DataFrame:
         """ Run Episode Mining algorithm on Pandas Dataframe
@@ -93,7 +112,8 @@ class EpisodeRules(Episode):
 
         :return: Dataframe containing patterns and corresponding support and confidence
         """
-        return pd.DataFrame((patterns, supports, confidence), index=['Frequent episode', 'Support', 'Confidence']).T
+        patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
+        return pd.DataFrame((patterns_mapped, supports, confidence), index=['Frequent episode', 'Support', 'Confidence']).T
 
     def run_pandas(self, input_df: pd.DataFrame) -> pd.DataFrame:
         """ Run Episode Mining algorithm on Pandas Dataframe
