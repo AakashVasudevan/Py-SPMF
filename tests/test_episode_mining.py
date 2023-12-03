@@ -18,6 +18,14 @@ def create_mock_dataframe(file_path: Text) -> pd.DataFrame:
     return pd.DataFrame(lines, columns=['Itemset', 'Time points'])
 
 
+def create_mock_raw_dataframe() -> pd.DataFrame:
+    """ Create raw mock dataframe """
+    return pd.DataFrame({
+        'Time points': [1, 2, 3, 3, 6, 7, 7, 8, 9, 11],
+        'Itemset': ['a', 'a', 'a', 'b', 'a', 'a', 'b', 'c', 'b', 'd'],
+    })
+
+
 def test_tke_example_file() -> None:
     """ Test TKE on given example in
         https://www.philippe-fournier-viger.com/spmf/TKEepisodes.php
@@ -38,6 +46,13 @@ def test_tke_example_pandas() -> None:
     output = tke.run_pandas(mock_df)
     assert len(output) > 0
     assert set(output['Frequent episode'].to_list()) == {'1', '2', '1 2', '1 -> 1', '1 -> 2', '1 -> 1 2'}
+    assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
+
+    tke = TKE(k=6, max_window=2, timestamp_present=True, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = tke.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {'a', 'b', 'a b', 'a -> a', 'a -> b', 'a -> a b'}
     assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
 
 
@@ -67,6 +82,15 @@ def test_tke_rules_example_pandas() -> None:
     assert set(output['Support'].to_list()) == {2, 2, 3}
     assert set(output['Confidence'].to_list()) == {0.4, 0.6, 0.4}
 
+    tke_rules = TKERules(k=6, max_window=2, timestamp_present=True,
+                         min_confidence=0.2, max_consequent_count=1, min_support=2, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = tke_rules.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {f'{{a}} ==> {{b}}', f'{{a}} ==> {{a,b}}', f'{{a}} ==> {{a}}'}
+    assert set(output['Support'].to_list()) == {2, 2, 3}
+    assert set(output['Confidence'].to_list()) == {0.4, 0.6, 0.4}
+
 
 def test_emma_example_file() -> None:
     """ Test EMMA on given example in
@@ -88,6 +112,13 @@ def test_emma_example_pandas() -> None:
     output = emma.run_pandas(mock_df)
     assert len(output) > 0
     assert set(output['Frequent episode'].to_list()) == {'1', '2', '1 2', '1 -> 1', '1 -> 2', '1 -> 1 2'}
+    assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
+
+    emma = EMMA(min_support=2, max_window=2, timestamp_present=True, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = emma.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {'a', 'b', 'a b', 'a -> a', 'a -> b', 'a -> a b'}
     assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
 
 
@@ -117,6 +148,15 @@ def test_emma_rules_example_pandas() -> None:
     assert set(output['Support'].to_list()) == {2, 2, 3}
     assert set(output['Confidence'].to_list()) == {0.4, 0.6, 0.4}
 
+    emma_rules = EMMARules(max_window=2, timestamp_present=True, min_confidence=0.2,
+                           max_consequent_count=1, min_support=2, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = emma_rules.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {f'{{a}} ==> {{b}}', f'{{a}} ==> {{a,b}}', f'{{a}} ==> {{a}}'}
+    assert set(output['Support'].to_list()) == {2, 2, 3}
+    assert set(output['Confidence'].to_list()) == {0.4, 0.6, 0.4}
+
 
 def test_afem_example_file() -> None:
     """ Test AFEM on given example in
@@ -138,6 +178,13 @@ def test_afem_example_pandas() -> None:
     output = afem.run_pandas(mock_df)
     assert len(output) > 0
     assert set(output['Frequent episode'].to_list()) == {'1', '2', '1 2', '1 -> 1', '1 -> 2', '1 -> 1 2'}
+    assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
+
+    afem = AFEM(min_support=2, max_window=2, timestamp_present=True, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = afem.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {'a', 'b', 'a b', 'a -> a', 'a -> b', 'a -> a b'}
     assert set(output['Support'].to_list()) == {5, 3, 2, 3, 2, 2}
 
 
@@ -163,6 +210,13 @@ def test_maxfem_example_pandas() -> None:
     assert set(output['Frequent episode'].to_list()) == {'1 -> 1 2'}
     assert set(output['Support'].to_list()) == {2}
 
+    maxfem = MaxFEM(min_support=2, max_window=2, timestamp_present=True, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = maxfem.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {'a -> a b'}
+    assert set(output['Support'].to_list()) == {2}
+
 
 def test_nonepi_example_file() -> None:
     """ Test NONEPI on given example in
@@ -185,5 +239,13 @@ def test_nonepi_example_pandas() -> None:
     output = nonepi.run_pandas(mock_df)
     assert len(output) > 0
     assert set(output['Frequent episode'].to_list()) == {f'{{1}} ==> {{1}}{{1 2}}'}
+    assert set(output['Support'].to_list()) == {3}
+    assert set(output['Confidence'].to_list()) == {0.6666667}
+
+    nonepi = NONEPI(min_support=2, min_confidence=0.2, transform=True)
+    mock_df = create_mock_raw_dataframe()
+    output = nonepi.run_pandas(mock_df)
+    assert len(output) > 0
+    assert set(output['Frequent episode'].to_list()) == {f'{{a}} ==> {{a}}{{a b}}'}
     assert set(output['Support'].to_list()) == {3}
     assert set(output['Confidence'].to_list()) == {0.6666667}
