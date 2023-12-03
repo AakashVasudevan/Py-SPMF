@@ -16,12 +16,13 @@ import pandas as pd
 class Spmf(ABC):
     """ Abstract Base Class for SPMF Wrapper """
 
-    def __init__(self, memory: int = 1024, output_file_name: Text = 'output.txt') -> None:
+    def __init__(self, transform: bool = False, memory: int = 1024, output_file_name: Text = 'output.txt') -> None:
         """ Initialize Object
 
         :param memory:
         """
         self.executable_path = os.path.join('binaries', 'spmf.jar')
+        self.transform = transform
         self.output_file_name = output_file_name
         self.memory = memory
 
