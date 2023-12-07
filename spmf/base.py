@@ -8,6 +8,7 @@ import os
 import subprocess
 import tempfile
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, List, Text
 
 import pandas as pd
@@ -16,14 +17,16 @@ import pandas as pd
 class Spmf(ABC):
     """ Abstract Base Class for SPMF Wrapper """
 
-    def __init__(self, transform: bool = False, memory: int = 1024, output_file_name: Text = 'output.txt') -> None:
+    def __init__(self, transform: bool = False, memory: int = 1024, executable_path: Text = './binaries/spmf.jar') -> None:
         """ Initialize Object
 
-        :param memory:
+        :param transform: Set to true if the input dataframe is not transformed to the format required by SPMF. Default = False.
+        :param memory: Maximum memory allocated to the SPMF process. Increase for larger datasets. Default = 1 GB
+        :param executable_path: Complete or relative path to spmf.jar file. Default = './binaries/spmf.jar'
         """
-        self.executable_path = os.path.join('binaries', 'spmf.jar')
+        self.executable_path = Path(executable_path)
         self.transform = transform
-        self.output_file_name = output_file_name
+        self.output_file_name = 'output.txt'
         self.memory = memory
 
     @abstractmethod
@@ -63,12 +66,14 @@ class Spmf(ABC):
         :param input_file_name: Input txt file name
         :return: Results of the SPMF algorithm parsed from output file
         """
-
         self.run(input_file_name)
         return self._parse_output_file(delete=True)
 
     def run(self, input_file_name: Text) -> None:
-        """ Run SPMF Algorithm """
+        """ Create subprocess to run SPMF Algorithm on Java VE
+
+        :param input_file_name: Complete path to input txt file to pass to SPMF
+        """
 
         process_arguments = self._create_subprocess_arguments(input_file_name)
 
@@ -83,18 +88,18 @@ class Spmf(ABC):
     def _convert_dataframe_to_file_object(self, input_df: pd.DataFrame) -> tempfile:
         """ Convert input dataframe to text file object
 
-        :param input_df:
-        :return:
+        :param input_df: Input dataframe
+        :return: Text file object of temporary file
         """
         return self._create_temp_file(
             input=self._parse_input_dataframe(input_df)
         )
 
-    def _read_output_file(self, delete: bool = False) -> List[Text]:
-        """ Read output txt file created by SPMF into a list
+    def _read_file(self, delete: bool = False) -> List[Text]:
+        """ Read file into a list
 
-        :param delete: Set to True to delete the output file after reading
-        :return: List containing each line in the output file as Text
+        :param delete: Set to True to delete the file after reading. Default = False.
+        :return: List containing each line in the file as Text
         """
 
         with open(self.output_file_name, 'r') as fp:

@@ -15,7 +15,7 @@ class Episode(Spmf):
         """ Transform input dataframe to the format required by SPMF
 
         :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
-            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+            NOTE: If Timestamp present, dataframe should contain it in 'Time points' column
         :return: Transformed dataframe
         """
 
@@ -39,7 +39,7 @@ class Episode(Spmf):
         """ Parse Input Dataframe to string format required for Episode Mining
 
         :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
-            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+            NOTE: If Timestamp present, dataframe should contain it in 'Time points' column
         :return: Parsed String representation
         """
         df = self._transform_input_dataframe(input_df)
@@ -52,7 +52,7 @@ class Episode(Spmf):
         :param kwargs: keyword arguments to read output file (delete)
         :return: Tuple of patterns and corresponding support
         """
-        lines = self._read_output_file(**kwargs)
+        lines = self._read_file(**kwargs)
         patterns, supports = [], []
 
         for line in lines:
@@ -65,6 +65,8 @@ class Episode(Spmf):
     def _create_output_dataframe(self, patterns: List[Text], supports: List[int]) -> pd.DataFrame:
         """ Create Output Dataframe
 
+        :param patterns: Frequent Episode Patterns return by the episode mining algorithm
+        :param supports: Corresponding supports for each pattern
         :return: Dataframe containing patterns and corresponding support
         """
         patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
@@ -74,7 +76,7 @@ class Episode(Spmf):
         """ Run Episode Mining algorithm on Pandas Dataframe
 
         :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
-            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+            NOTE: If Timestamp present, dataframe should contain it in 'Time points' column
         :return: Dataframe containing the frequent episodes and support.
         """
         return super().run_pandas(input_df)
@@ -97,7 +99,7 @@ class EpisodeRules(Episode):
         :param kwargs: keyword arguments to read output file (delete)
         :return: Tuple of patterns and corresponding support and confidence
         """
-        lines = self._read_output_file(**kwargs)
+        lines = self._read_file(**kwargs)
         patterns, supports, confidence = [], [], []
         for line in lines:
             line = line.strip().split('#')
@@ -110,6 +112,9 @@ class EpisodeRules(Episode):
     def _create_output_dataframe(self, patterns: List[Text], supports: List[int], confidence: List[float]) -> pd.DataFrame:
         """ Create Output Dataframe
 
+        :param patterns: Frequent Episode Rules returned by the episode rule mining algorithm
+        :param supports: Corresponding supports for each rule
+        :param confidence: Corresponding confidence for each rule
         :return: Dataframe containing patterns and corresponding support and confidence
         """
         patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
@@ -119,7 +124,7 @@ class EpisodeRules(Episode):
         """ Run Episode Mining algorithm on Pandas Dataframe
 
         :param input_df: Input Dataframe containing Itemsets in 'Itemset' column
-            NOTE: If Timestamp present, dataframe should contain it 'Time points' column
+            NOTE: If Timestamp present, dataframe should contain it in 'Time points' column
         :return: Dataframe containing the frequent episodes and support.
         """
         return super().run_pandas(input_df)
@@ -137,12 +142,12 @@ class TKE(Episode):
     """ Top K Frequent Episode Mining """
 
     def __init__(self, k: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/TKEepisodes.php
 
-        :param k:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param k: (a positive integer) indicating the number of episodes to find
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -174,15 +179,15 @@ class TKERules(EpisodeRules):
     """ Episode Rule Mining using TKE """
 
     def __init__(self, k: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, min_support: int = 2, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
 
-        :param k:
-        :param max_window:
-        :param timestamp_present:
-        :param min_confidence:
-        :param max_consequent_count:
-        :param min_support:
-        :param kwargs:
+        :param k: (a positive integer) indicating the number of episodes to find
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param min_confidence: minimum confidence level
+        :param max_consequent_count: max consequent
+        :param min_support: minimum occurrence frequency
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -220,12 +225,12 @@ class EMMA(Episode):
     """ Frequent Episode Mining using EMMA """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/EMMA.php
 
-        :param min_support:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param min_support: minimum occurence frequency
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -257,12 +262,12 @@ class EMMARules(EpisodeRules):
     """ Frequent Episode Mining using EMMA """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
 
-        :param min_support:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param min_support: minimum occurence frequency
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -298,12 +303,12 @@ class AFEM(Episode):
     """ Frequent Episode Mining using AFEM """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/AFEM_temporal.php
 
-        :param min_support:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param min_support: minimum occurence frequency
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -335,12 +340,12 @@ class MaxFEM(Episode):
     """ Frequent Episode Mining using MaxFEM """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/MAXFEM_MAXIMAL_EPISODE_MINING.php
 
-        :param min_support:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param min_support: minimum occurence frequency
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
@@ -372,12 +377,12 @@ class NONEPI(EpisodeRules):
     """ Frequent Episode Mining using NONEPI """
 
     def __init__(self, min_support: int, min_confidence: float = 0.5, **kwargs) -> None:
-        """ Initialize Object
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/NONEPI_episode_rules.php
 
-        :param min_support:
-        :param max_window:
-        :param timestamp_present:
-        :param kwargs: Keyword arguments to base SPMF. E.g., memory
+        :param min_support: minimum occurence frequency
+        :param max_window: maximum window length
+        :param timestamp_present: Bool indicating if timestamp is present
+        :param kwargs: Keyword arguments to base SPMF. (transform, memory and executable_path)
         """
         super().__init__(**kwargs)
 
