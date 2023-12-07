@@ -4,6 +4,7 @@ Python Wrapper for [SPMF Java library](http://www.philippe-fournier-viger.com/sp
 ## Information
 This module contains python wrappers for pattern mining algorithms implemented in SPMF Java library. Each algorithm is implemented as a standalone Python class with fully descriptive and tested APIs. It also provides native support for Pandas dataframes.
 
+Why? If you're in a Python pipeline, it might be cumbersome to use Java as an intermediate step. Using `Py-SPMF` you can stay in your pipeline as though Java is never used at all.
 
 ## Installation
 [`pip install spmf`](https://pypi.org/project/spmf/)
@@ -13,79 +14,70 @@ Example:
 ```python
 from spmf.episode import EMMA
 
-emma = EMMA(min_support=2, max_window=2, timestamp_present=True)
+emma = EMMA(min_support=2, max_window=2, timestamp_present=True, transform=True)
 output = emma.run_pandas(input_df)
 ```
 
+Input:
+
+| | Time points | Itemset
+| ---- | ------ | -------
+| 0	| 1	| a
+| 1	| 2	| a
+| 2	| 3	| a
+| 3	| 3	| b
+| 4	| 6	| a
+| 5	| 7	| a
+| 6	| 7	| b
+| 7	| 8	| c
+| 8	| 9	| b
+| 9	| 11	| d
+
 Output:
-```
-=============  PREFIXSPAN 0.99-2016 - STATISTICS =============
- Total time ~ 2 ms
- Frequent sequences count : 14
- Max memory (mb) : 6.487663269042969
- minsup = 3 sequences.
- Pattern count : 14
-===================================================
 
-      pattern sup
-0         [1]   4
-1      [1, 2]   4
-2      [1, 3]   4
-3   [1, 3, 2]   3
-4   [1, 3, 3]   3
-5         [2]   4
-6      [2, 3]   3
-7         [3]   4
-8      [3, 2]   3
-9      [3, 3]   3
-10        [4]   3
-11     [4, 3]   3
-12        [5]   3
-13        [6]   3
-```
+|	| Frequent episode | Support
+| --- | ---------------- | -------
+|0    |	a     |	5
+|1    |	b	|     3
+|2    |	a b	|     2
+|3	|     a-> a |	3
+|4	|     a -> b |	2
+|5	|     a -> a b |  2
 
-The usage is similar to the one described in the SPMF [documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).
-For all Python parameters, see the [Spmf class](https://github.com/LoLei/spmf-py/blob/master/spmf/__init__.py).
+See [examples]('https://github.com/AakashVasudevan/Py-SPMF/tree/main/examples') for more details.
 
-### SPMF Arguments
-The `arguments` parameter are the arguments that are passed to SPMF and depend on the chosen algorithm. SPMF handles optional parameters as an ordered list. As there are no named parameters for the algorithms, if e.g. only the first and the last parameter of an algorithm are to be used, the ones in between must be filled with `""` blank strings.
-For advanced usage examples, see [`examples`](https://github.com/LoLei/spmf-py/tree/master/examples).
+For a detailed explanation of the algorithm and parameters, refer to the corresponding webpage in the SPMF [documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).
+
 
 ### SPMF Executable
+
 Download it from the [SPMF Website](http://www.philippe-fournier-viger.com/spmf/index.php?link=download.php).
-It is assumed that the SPMF binary `spmf.jar` is located in the same directory as `spmf-py`. If it is not, either symlink it, or use the `spmf_bin_location_dir` parameter.
+It is assumed that the SPMF binary `spmf.jar` is located in the `binaries` directory inside `Py-SPMF`. If it is not, either symlink it, or use the `executable_path` parameter.
 
-### Input Formats
-Either use an input file as specified by SPMF, or use one of the in-line formats as seen in [`examples`](https://github.com/LoLei/spmf-py/tree/master/examples).
 
-### Memory
-The maxmimum memory can be increased in the constructor via `Spmf(memory=n)`,
-where `n` is megabyte, see SPMF's
-[FAQ](http://www.philippe-fournier-viger.com/spmf/index.php?link=FAQ.php#memory).
-
-## Background
-Why? If you're in a Python pipeline, like a Jupyter Notebook, it might be cumbersome to use Java as an intermediate step. Using `spmf-py` you can stay in your pipeline as though Java is never used at all.
-
-## Implementation
+## Implementation Checklist
 
 ### Episode Mining
 
-- algorithms for mining frequent episodes
-
-      The EMMA algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Kuo-Yu et al., 2008)
-
-      The AFEM algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Fournier-Viger et al., 2022 )
-
-      The MINEPI+ algorithm, which finds the frequent episodes, and counts the support based on the head frequency (Kuo-Yu et al., 2008)
-
-      The MINEPI algorithm, which finds the frequent episodes, counts the support based on minimal occurrences, and does not allow simultaneous events (Mannila & Toivonen, 1997)
-
-- algorithms for mining the top-k frequent episodes
-
-      The TKE algorithm, which finds the top-k most frequent episodes based on the head frequency (Fournier-Viger et al., 2020)
-
-algorithms for mining maximal frequent episodes
-the MaxFEM algorithm, which finds the maximal frequent episodes, and counts the support based on th
+| Algorithm| Type | Implemented
+| -------- | ------- | ---------
+| EMMA  | Frequent Episode | &check;
+| AFEM | Frequent Episode | &check;
+| MINEPI | Frequent Episode |
+| MINEPI+ | Frequent Episode | &check;
+| TKE | Top-k Frequent Episodes | &check;
+| MaxFEM | Maximal Frequent Episodes | &check;
+| POERM | Episode Rules |
+| POERM-ALL | Episode Rules |
+| POERMH | Episode Rules |
+| NONEPI | Episode Rules | &check;
+| TKE-Rules | Episode Rules | &check;
+| AFEM-Rules | Episode Rules | &check;
+| EMMA-Rules | Epsiode Rules | &check;
+| MINEPI+-Rules | Episode Rules |
+| HUE-SPAN | High Utility Episodes |
+| US-SPAN | High Utility Episodes |
+| TUP | Top-K High Utility Episodes |
 
 
 ## Bibliography
@@ -94,14 +86,3 @@ Fournier-Viger, P., Lin, C.W., Gomariz, A., Gueniche, T., Soltani, A., Deng, Z.,
 The SPMF Open-Source Data Mining Library Version 2.
 Proc. 19th European Conference on Principles of Data Mining and Knowledge Discovery (PKDD 2016) Part III, Springer LNCS 9853,  pp. 36-40.
 ```
-
-## Disclaimer
-
-Use at your own risk. This repo is not/barely maintained. Use SPMF itself for more robust results.
-
-This module has been tested for a fraction of the algorithms offered in SPMF.
-Calling them and writing to the output file should be possible for all.
-Output parsing however should work for those that have outputs like the sequential pattern mining algorithms.
-It was not tested with other types, some adaption of the output parsing might be necessary.
-
-If something is not working, submit an issue or create a PR yourself!
