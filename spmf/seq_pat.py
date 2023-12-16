@@ -1,6 +1,7 @@
 """ Sequential Pattern Mining """
 
 import re
+import warnings
 from typing import List, Text, Tuple
 
 import pandas as pd
@@ -91,17 +92,22 @@ class SeqPat(Spmf):
 
 
 class PrefixSpan(SeqPat):
-    """ PrefixSpan Sequential Pattern Mining """
+    """ Mining Frequent Sequential Patterns Using The PrefixSpan Algorithm """
 
-    def __init__(self, min_support: float, max_pattern_length: int = 0, **kwargs) -> None:
+    def __init__(self, min_support: float, max_pattern_length: int = 0, show_seq_ids: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php
 
         :param min_support: minimum occurence frequency
         :param max_pattern_length (optional): maximum number of items that patterns found should contain
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
         """
         super().__init__(**kwargs)
         self.min_support = min_support
         self.max_pattern_length = max_pattern_length
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
 
     def _create_subprocess_arguments(self, input_file_name: Text) -> List:
         """ Create arguments list to pass to subprocess """
@@ -122,3 +128,262 @@ class PrefixSpan(SeqPat):
             arguments.update({'max_pattern_length': str(self.max_pattern_length)})
 
         return list(arguments.values())
+
+
+class SPADE(SeqPat):
+    """ Mining Frequent Sequential Patterns Using The SPADE Algorithm """
+
+    def __init__(self, min_support: float, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/SPADE.php
+
+        :param min_support: minimum occurence frequency
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'SPADE',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support)
+        }
+
+        return list(arguments.values())
+
+
+class CMSPADE(SeqPat):
+    """ Mining Frequent Sequential Patterns Using The CM-SPADE Algorithm """
+
+    def __init__(self, min_support: float, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/CM-SPADE.php
+
+        :param min_support: minimum occurence frequency
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'CM-SPADE',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support)
+        }
+
+        return list(arguments.values())
+
+
+class SPAM(SeqPat):
+    """ Mining Frequent Sequential Patterns Using The SPAM Algorithm """
+
+    def __init__(self, min_support: float, min_pattern_length: int = 0, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/SPAM.php
+
+        :param min_support: minimum occurence frequency
+        :param min_pattern_length (optional): minimum pattern length in the output. Default = 0
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+        self.min_pattern_length = min_pattern_length
+        self.max_pattern_length = max_pattern_length
+        self.max_gap = max_gap
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'SPAM',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support),
+            'min_pattern_length': str(self.min_pattern_length),
+            'max_pattern_length': str(self.max_pattern_length),
+            'max_gap': str(self.max_gap)
+        }
+
+        return [value for value in arguments.values() if value != 'None']
+
+
+class ClaSP(SeqPat):
+    """ Mining Frequent Closed Sequential Patterns Using The ClaSP Algorithm """
+
+    def __init__(self, min_support: float, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/ClaSP.php
+
+        :param min_support: minimum occurence frequency
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'ClaSP',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support)
+        }
+
+        return list(arguments.values())
+
+
+class CMClaSP(SeqPat):
+    """ Mining Frequent Closed Sequential Patterns Using The CM-ClaSP Algorithm """
+
+    def __init__(self, min_support: float, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/CM-ClaSP.php
+
+        :param min_support: minimum occurence frequency
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'CM-ClaSP',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support)
+        }
+
+        return list(arguments.values())
+
+
+class VMSP(SeqPat):
+    """ Mining Frequent Maximal Sequential Patterns Using The VMSP Algorithm """
+
+    def __init__(self, min_support: float, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/VMSP.php
+
+        :param min_support: minimum occurence frequency
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+        self.max_pattern_length = max_pattern_length
+        self.max_gap = max_gap
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'VMSP',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support),
+            'max_pattern_length': str(self.max_pattern_length),
+            'max_gap': str(self.max_gap)
+        }
+
+        return [value for value in arguments.values() if value != 'None']
+
+
+class VGEN(SeqPat):
+    """ Mining Frequent Sequential Generator Patterns Using The VGEN Algorithm """
+
+    def __init__(self, min_support: float, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/VGEN.php
+
+        :param min_support: minimum occurence frequency
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
+        :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+        self.max_pattern_length = max_pattern_length
+        self.max_gap = max_gap
+
+        # TODO
+        if show_seq_ids:
+            warnings.warn('Sequence IDs in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'VGEN',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_support': str(self.min_support),
+            'max_pattern_length': str(self.max_pattern_length),
+            'max_gap': str(self.max_gap)
+        }
+
+        return [value for value in arguments.values() if value != 'None']
