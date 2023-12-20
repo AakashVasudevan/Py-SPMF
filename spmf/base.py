@@ -17,10 +17,10 @@ import pandas as pd
 class Spmf(ABC):
     """ Abstract Base Class for SPMF Wrapper """
 
-    def __init__(self, transform: bool = False, memory: int = 1024, executable_path: Text = './binaries/spmf.jar') -> None:
+    def __init__(self, transform: bool = True, memory: int = 1024, executable_path: Text = './binaries/spmf.jar') -> None:
         """ Initialize Object
 
-        :param transform: Set to true if the input dataframe is not transformed to the format required by SPMF. Default = False.
+        :param transform: Set to true if the input dataframe is not transformed to the format required by SPMF. Default = True.
         :param memory: Maximum memory allocated to the SPMF process. Increase for larger datasets. Default = 1 GB
         :param executable_path: Complete or relative path to spmf.jar file. Default = './binaries/spmf.jar'
         """
