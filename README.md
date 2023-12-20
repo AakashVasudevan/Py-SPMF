@@ -7,7 +7,16 @@ This module contains python wrappers for pattern mining algorithms implemented i
 Why? If you're in a Python pipeline, it might be cumbersome to use Java as an intermediate step. Using `Py-SPMF` you can stay in your pipeline as though Java is never used at all.
 
 ## Installation
-[`pip install spmf`](https://pypi.org/project/spmf/)
+[`pip install pyspmf`](https://pypi.org/project/spmf/)
+
+Ensure Java Runtime Environment is also installed. Follow instructions [`here`](https://www.java.com/en/download/help/download_options.html). Test installation by running the following command on the terminal:
+
+```
+> java -version
+java version "1.8.0_391"
+Java(TM) SE Runtime Environment (build 1.8.0_391-b13)
+Java HotSpot(TM) 64-Bit Server VM (build 25.391-b13, mixed mode)
+```
 
 ## Usage
 Example:
@@ -31,7 +40,7 @@ Input:
 | 6	| 7	| b
 | 7	| 8	| c
 | 8	| 9	| b
-| 9	| 11	| d
+| 9	| 11 | d
 
 Output:
 
@@ -56,6 +65,34 @@ It is assumed that the SPMF binary `spmf.jar` is located in the `binaries` direc
 
 
 ## Implementation Checklist
+
+### Sequential Pattern Mining
+
+| Algorithm| Type | Implemented
+| -------- | ------- | ---------
+| PrefixSpan | Frequent Sequential Pattern | &check;
+| GSP | Frequent Sequential Pattern |
+| SPADE | Frequent Sequential Pattern | &check;
+| CM-SPADE | Frequent Sequential Pattern | &check;
+| SPAM | Frequent Sequential Pattern | &check;
+| CM-SPAM | Frequent Sequential Pattern |
+| FAST | Frequent Sequential Pattern |
+| LAPIN | Frequent Sequential Pattern |
+| ClaSP | Frequent Closed Sequential Pattern | &check;
+| CM-ClaSP | Frequent Closed Sequential Pattern | &check;
+| CloFAST | Frequent Closed Sequential Pattern |
+| CloSpan | Frequent Closed Sequential Pattern |
+| BIDE+ | Frequent Closed Sequential Pattern |
+| Post Processing SPAM or PrefixSpan | Frequent Closed Sequential Pattern |
+| MaxSP | Frequent Maximal Sequential Pattern |
+| VMSP | Frequent Maximal Sequential Pattern | &check;
+| FEAT | Frequent Sequential Generator Pattern |
+| FSGP | Frequent Sequential Generator Pattern |
+| VGEN | Frequent Sequential Generator Pattern | &check;
+| NOSEP | Non-overlapping Sequential Pattern | &check;
+| GoKrimp | Compressing Sequential Pattern |
+| TKS | Top-k Frequent Sequential Pattern | &check;
+| TSP | Top-k Frequent Sequential Pattern |
 
 ### Episode Mining
 
