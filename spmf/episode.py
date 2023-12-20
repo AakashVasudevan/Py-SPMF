@@ -139,7 +139,7 @@ class EpisodeRules(Episode):
 
 
 class TKE(Episode):
-    """ Top K Frequent Episode Mining """
+    """ Mining The Top-K Frequent Episodes In A Complex Event Sequence Using The TKE Algorithm """
 
     def __init__(self, k: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/TKEepisodes.php
@@ -176,7 +176,7 @@ class TKE(Episode):
 
 
 class TKERules(EpisodeRules):
-    """ Episode Rule Mining using TKE """
+    """ Mining Episode Rules In A Complex Sequence Using The TKE Algorithm """
 
     def __init__(self, k: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, min_support: int = 2, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
@@ -222,7 +222,7 @@ class TKERules(EpisodeRules):
 
 
 class EMMA(Episode):
-    """ Frequent Episode Mining using EMMA """
+    """ Mining Frequent Episodes In A Complex Event Sequence Using The EMMA Algorithm """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/EMMA.php
@@ -259,7 +259,7 @@ class EMMA(Episode):
 
 
 class EMMARules(EpisodeRules):
-    """ Frequent Episode Mining using EMMA """
+    """ Mining Episode Rules In A Complex Sequence Using the EMMA Algorithm """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, min_confidence: float = 0.5, max_consequent_count: int = 1, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
@@ -300,7 +300,7 @@ class EMMARules(EpisodeRules):
 
 
 class AFEM(Episode):
-    """ Frequent Episode Mining using AFEM """
+    """ Mining Frequent Episodes In A Complex Event Sequence Using The AFEM Algorithm """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/AFEM_temporal.php
@@ -337,7 +337,7 @@ class AFEM(Episode):
 
 
 class MaxFEM(Episode):
-    """ Frequent Episode Mining using MaxFEM """
+    """ Mining Maximal Frequent Episodes In A Complex Event Sequence Using The MaxFEM Algorithm """
 
     def __init__(self, min_support: int, max_window: int, timestamp_present: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/MAXFEM_MAXIMAL_EPISODE_MINING.php
@@ -374,7 +374,7 @@ class MaxFEM(Episode):
 
 
 class NONEPI(EpisodeRules):
-    """ Frequent Episode Mining using NONEPI """
+    """ Mining Episode Rules In A Complex Sequence With The Non-Overlapping Frequency Using The NONEPI Algorithm """
 
     def __init__(self, min_support: int, min_confidence: float = 0.5, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/NONEPI_episode_rules.php

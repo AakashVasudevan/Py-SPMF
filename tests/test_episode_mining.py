@@ -41,7 +41,7 @@ def test_tke_example_pandas() -> None:
     """ Test TKE on given example in
         https://www.philippe-fournier-viger.com/spmf/TKEepisodes.php
     """
-    tke = TKE(k=6, max_window=2, timestamp_present=True)
+    tke = TKE(k=6, max_window=2, timestamp_present=True, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = tke.run_pandas(mock_df)
     assert len(output) > 0
@@ -74,7 +74,7 @@ def test_tke_rules_example_pandas() -> None:
         https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
     """
     tke_rules = TKERules(k=6, max_window=2, timestamp_present=True,
-                         min_confidence=0.2, max_consequent_count=1, min_support=2)
+                         min_confidence=0.2, max_consequent_count=1, min_support=2, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = tke_rules.run_pandas(mock_df)
     assert len(output) > 0
@@ -107,7 +107,7 @@ def test_emma_example_pandas() -> None:
     """ Test EMMA on given example in
         https://www.philippe-fournier-viger.com/spmf/EMMA.php
     """
-    emma = EMMA(min_support=2, max_window=2, timestamp_present=True)
+    emma = EMMA(min_support=2, max_window=2, timestamp_present=True, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = emma.run_pandas(mock_df)
     assert len(output) > 0
@@ -140,7 +140,7 @@ def test_emma_rules_example_pandas() -> None:
         https://www.philippe-fournier-viger.com/spmf/standard_episode_rules.php
     """
     emma_rules = EMMARules(max_window=2, timestamp_present=True, min_confidence=0.2,
-                           max_consequent_count=1, min_support=2)
+                           max_consequent_count=1, min_support=2, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = emma_rules.run_pandas(mock_df)
     assert len(output) > 0
@@ -173,7 +173,7 @@ def test_afem_example_pandas() -> None:
     """ Test AFEM on given example in
         https://www.philippe-fournier-viger.com/spmf/AFEM_temporal.php
     """
-    afem = AFEM(min_support=2, max_window=2, timestamp_present=True)
+    afem = AFEM(min_support=2, max_window=2, timestamp_present=True, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = afem.run_pandas(mock_df)
     assert len(output) > 0
@@ -203,7 +203,7 @@ def test_maxfem_example_pandas() -> None:
     """ Test MaxFEM on given example in
         https://www.philippe-fournier-viger.com/spmf/MAXFEM_MAXIMAL_EPISODE_MINING.php
     """
-    maxfem = MaxFEM(min_support=2, max_window=2, timestamp_present=True)
+    maxfem = MaxFEM(min_support=2, max_window=2, timestamp_present=True, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = maxfem.run_pandas(mock_df)
     assert len(output) > 0
@@ -234,7 +234,7 @@ def test_nonepi_example_pandas() -> None:
     """ Test NONEPI on given example in
         https://www.philippe-fournier-viger.com/spmf/NONEPI_episode_rules.php
     """
-    nonepi = NONEPI(min_support=2, min_confidence=0.2)
+    nonepi = NONEPI(min_support=2, min_confidence=0.2, transform=False)
     mock_df = create_mock_dataframe(test_file_path)
     output = nonepi.run_pandas(mock_df)
     assert len(output) > 0
