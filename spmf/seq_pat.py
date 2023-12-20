@@ -94,7 +94,7 @@ class SeqPat(Spmf):
 class PrefixSpan(SeqPat):
     """ Mining Frequent Sequential Patterns Using The PrefixSpan Algorithm """
 
-    def __init__(self, min_support: float, max_pattern_length: int = 0, show_seq_ids: bool = False, **kwargs) -> None:
+    def __init__(self, min_support: float, max_pattern_length: int = None, show_seq_ids: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php
 
         :param min_support: minimum occurence frequency
@@ -103,7 +103,7 @@ class PrefixSpan(SeqPat):
         """
         super().__init__(**kwargs)
         self.min_support = min_support
-        self.max_pattern_length = max_pattern_length
+        self.max_pattern_length = max_pattern_length if max_pattern_length else ''
 
         # TODO
         if show_seq_ids:
@@ -121,11 +121,9 @@ class PrefixSpan(SeqPat):
             'Algorithm': 'PrefixSpan',
             'Input': input_file_name,
             'Output': self.output_file_name,
-            'min_support': str(self.min_support)
+            'min_support': str(self.min_support),
+            'max_pattern_length': str(self.max_pattern_length),
         }
-
-        if self.max_pattern_length > 0:
-            arguments.update({'max_pattern_length': str(self.max_pattern_length)})
 
         return list(arguments.values())
 
@@ -201,20 +199,20 @@ class CMSPADE(SeqPat):
 class SPAM(SeqPat):
     """ Mining Frequent Sequential Patterns Using The SPAM Algorithm """
 
-    def __init__(self, min_support: float, min_pattern_length: int = 0, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+    def __init__(self, min_support: float, min_pattern_length: int = None, max_pattern_length: int = None, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/SPAM.php
 
         :param min_support: minimum occurence frequency
-        :param min_pattern_length (optional): minimum pattern length in the output. Default = 0
-        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param min_pattern_length (optional): minimum pattern length in the output. Default = 1
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = +inf
         :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
         :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
         """
         super().__init__(**kwargs)
         self.min_support = min_support
-        self.min_pattern_length = min_pattern_length
-        self.max_pattern_length = max_pattern_length
-        self.max_gap = max_gap
+        self.min_pattern_length = min_pattern_length if min_pattern_length else ''
+        self.max_pattern_length = max_pattern_length if max_pattern_length else ''
+        self.max_gap = max_gap if max_gap else ''
 
         # TODO
         if show_seq_ids:
@@ -238,7 +236,7 @@ class SPAM(SeqPat):
             'max_gap': str(self.max_gap)
         }
 
-        return [value for value in arguments.values() if value != 'None']
+        return list(arguments.values())
 
 
 class ClaSP(SeqPat):
@@ -312,18 +310,18 @@ class CMClaSP(SeqPat):
 class VMSP(SeqPat):
     """ Mining Frequent Maximal Sequential Patterns Using The VMSP Algorithm """
 
-    def __init__(self, min_support: float, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+    def __init__(self, min_support: float, max_pattern_length: int = None, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/VMSP.php
 
         :param min_support: minimum occurence frequency
-        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = +inf
         :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
         :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
         """
         super().__init__(**kwargs)
         self.min_support = min_support
-        self.max_pattern_length = max_pattern_length
-        self.max_gap = max_gap
+        self.max_pattern_length = max_pattern_length if max_pattern_length else ''
+        self.max_gap = max_gap if max_gap else ''
 
         # TODO
         if show_seq_ids:
@@ -346,24 +344,24 @@ class VMSP(SeqPat):
             'max_gap': str(self.max_gap)
         }
 
-        return [value for value in arguments.values() if value != 'None']
+        return list(arguments.values())
 
 
 class VGEN(SeqPat):
     """ Mining Frequent Sequential Generator Patterns Using The VGEN Algorithm """
 
-    def __init__(self, min_support: float, max_pattern_length: int = 10000, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
+    def __init__(self, min_support: float, max_pattern_length: int = None, max_gap: int = None, show_seq_ids: bool = False, **kwargs) -> None:
         """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/VGEN.php
 
         :param min_support: minimum occurence frequency
-        :param max_pattern_length (optional): maximum pattern length in the output. Default = 10000
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = +inf
         :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
         :param show_seq_id (not implemented): Show sequence IDs for patterns in the output
         """
         super().__init__(**kwargs)
         self.min_support = min_support
-        self.max_pattern_length = max_pattern_length
-        self.max_gap = max_gap
+        self.max_pattern_length = max_pattern_length if max_pattern_length else ''
+        self.max_gap = max_gap if max_gap else ''
 
         # TODO
         if show_seq_ids:
@@ -386,4 +384,89 @@ class VGEN(SeqPat):
             'max_gap': str(self.max_gap)
         }
 
-        return [value for value in arguments.values() if value != 'None']
+        return list(arguments.values())
+
+
+class NOSEP(SeqPat):
+    """ Mining Nonoverlapping Sequential Patterns In One Or Many Sequences Using The NOSEP Algorithm """
+
+    def __init__(self, min_support: float, min_pattern_length: int = 1, max_pattern_length: int = 20, min_gap: int = 0, max_gap: int = 2, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/NOSEP.php
+
+        :param min_support: minimum occurence frequency
+        :param min_pattern_length (optional): minimum pattern length in the output. Default = 1
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = 20
+        :param min_gap (optional): minimum gap allowed between consecutive itemsets in the pattern. Default = 0
+        :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = 2
+        """
+        super().__init__(**kwargs)
+        self.min_support = min_support
+        self.min_pattern_length = min_pattern_length
+        self.max_pattern_length = max_pattern_length
+        self.min_gap = min_gap
+        self.max_gap = max_gap
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'NOSEP',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'min_pattern_length': str(self.min_pattern_length),
+            'max_pattern_length': str(self.max_pattern_length),
+            'min_gap': str(self.min_gap),
+            'max_gap': str(self.max_gap),
+            'min_support': str(self.min_support),
+        }
+
+        return list(arguments.values())
+
+
+class TKS(SeqPat):
+    """ Mining Top-K Sequential Patterns Using The TKS Algorithm """
+
+    def __init__(self, k: int, min_pattern_length: int = None, max_pattern_length: int = None, required_items: List[int] = None, max_gap: int = None, **kwargs) -> None:
+        """ Initialize Object. Refer to https://www.philippe-fournier-viger.com/spmf/TKS.php
+
+        :param k: number of patterns to output
+        :param min_pattern_length (optional): minimum pattern length in the output. Default = 1
+        :param max_pattern_length (optional): maximum pattern length in the output. Default = +inf
+        :param max_gap (optional): maximum gap allowed between consecutive itemsets in the pattern. Default = +inf
+        :param required_items (not implemented): list of items that must appears in every patterns found
+        """
+        super().__init__(**kwargs)
+        self.k = k
+        self.min_pattern_length = min_pattern_length if min_pattern_length else ''
+        self.max_pattern_length = max_pattern_length if max_pattern_length else ''
+        self.max_gap = max_gap if max_gap else ''
+
+        # TODO
+        if required_items:
+            warnings.warn('Required items in output not implemented. Ignoring argument.')
+
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+
+        arguments = {
+            'Subprocess': 'java',
+            'Memory': f'-Xmx{self.memory}m',
+            'Binary_Format': '-jar',
+            'Binary_File': self.executable_path,
+            'Command': 'run',
+            'Algorithm': 'TKS',
+            'Input': input_file_name,
+            'Output': self.output_file_name,
+            'k': str(self.k),
+            'min_pattern_length': str(self.min_pattern_length),
+            'max_pattern_length': str(self.max_pattern_length),
+            'required_items': '',
+            'max_gap': str(self.max_gap),
+        }
+
+        return list(arguments.values())
