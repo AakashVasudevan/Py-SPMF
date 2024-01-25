@@ -5,6 +5,7 @@
 *.pkl
 !examples/contextPrefixSpan.txt
 !tests/test_files/*
+!requirements.txt
 
 # vscode
 .vscode
