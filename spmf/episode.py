@@ -1,7 +1,7 @@
 """ Episode Mining """
 
 import re
-from typing import List, Text, Tuple
+from typing import Dict, List, Text, Tuple
 
 import pandas as pd
 
@@ -26,11 +26,11 @@ class Episode(Spmf):
             self.timestamp_present = True       # override timestamp parameter
 
         if not self.transform:
-            self.mapping = str.maketrans(dict())
+            self.mapping = dict()
             return df
 
         df['Items'] = (input_df.groupby('Itemset').ngroup()+1).astype(str)
-        self.mapping = str.maketrans(df.set_index('Items', drop=True).to_dict()['Itemset'])
+        self.mapping = df.set_index('Items', drop=True).to_dict()['Itemset']
 
         df = df.groupby('Time points').agg((' ').join).reset_index()
         return df.rename({'Items': 'Itemset', 'Itemset': 'Items'}, axis=1)
@@ -62,6 +62,21 @@ class Episode(Spmf):
 
         return patterns, list(map(int, supports))
 
+    @staticmethod
+    def map_pattern(pattern: Text, mapping: Dict[Text, Text]) -> Text:
+        """ Re-map each word in pattern to the corresponding value in the mapping dictionary
+
+        :param pattern: Pattern to map
+        :param mapping: Dictionary with words in input pattern as key and corresponding substitution string as values
+        :return: All words in pattern replaced by the corresponding value in mapping
+            NOTE: Original word in pattern is retained if a matching key is not found in mapping
+        """
+
+        for p in re.findall(r'\d+', pattern):
+            pattern = pattern.replace(p, mapping.get(p, p))
+
+        return pattern
+
     def _create_output_dataframe(self, patterns: List[Text], supports: List[int]) -> pd.DataFrame:
         """ Create Output Dataframe
 
@@ -69,7 +84,7 @@ class Episode(Spmf):
         :param supports: Corresponding supports for each pattern
         :return: Dataframe containing patterns and corresponding support
         """
-        patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
+        patterns_mapped = [self.map_pattern(pattern, self.mapping) for pattern in patterns]
         return pd.DataFrame((patterns_mapped, supports), index=['Frequent episode', 'Support']).T
 
     def run_pandas(self, input_df: pd.DataFrame) -> pd.DataFrame:
@@ -117,7 +132,7 @@ class EpisodeRules(Episode):
         :param confidence: Corresponding confidence for each rule
         :return: Dataframe containing patterns and corresponding support and confidence
         """
-        patterns_mapped = [pattern.translate(self.mapping) for pattern in patterns]
+        patterns_mapped = [self.map_pattern(pattern, self.mapping) for pattern in patterns]
         return pd.DataFrame((patterns_mapped, supports, confidence), index=['Frequent episode', 'Support', 'Confidence']).T
 
     def run_pandas(self, input_df: pd.DataFrame) -> pd.DataFrame:
