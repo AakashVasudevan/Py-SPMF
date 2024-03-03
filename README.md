@@ -1,13 +1,13 @@
-# Py-SPMF
+# SPMF
 Python Wrapper for [SPMF Java library](http://www.philippe-fournier-viger.com/spmf).
 
 ## Information
 This module contains python wrappers for pattern mining algorithms implemented in SPMF Java library. Each algorithm is implemented as a standalone Python class with fully descriptive and tested APIs. It also provides native support for Pandas dataframes.
 
-Why? If you're in a Python pipeline, it might be cumbersome to use Java as an intermediate step. Using `Py-SPMF` you can stay in your pipeline as though Java is never used at all.
+Why? If you're in a Python pipeline, it might be cumbersome to use Java as an intermediate step. Using `spmf-wrapper` you can stay in your pipeline as though Java is never used at all.
 
 ## Installation
-[`pip install pyspmf`](https://pypi.org/project/spmf/)
+[`pip install spmf-wrapper`](https://pypi.org/project/spmf-wrapper/)
 
 Ensure Java Runtime Environment is also installed. Follow instructions [`here`](https://www.java.com/en/download/help/download_options.html). Test installation by running the following command on the terminal:
 
@@ -21,7 +21,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.391-b13, mixed mode)
 ## Usage
 Example:
 ```python
-from spmf.episode import EMMA
+from spmf import EMMA
 
 emma = EMMA(min_support=2, max_window=2, timestamp_present=True, transform=True)
 output = emma.run_pandas(input_df)
@@ -56,13 +56,6 @@ Output:
 See [examples]('https://github.com/AakashVasudevan/Py-SPMF/tree/main/examples') for more details.
 
 For a detailed explanation of the algorithm and parameters, refer to the corresponding webpage in the SPMF [documentation](http://www.philippe-fournier-viger.com/spmf/index.php?link=documentation.php).
-
-
-### SPMF Executable
-
-Download it from the [SPMF Website](http://www.philippe-fournier-viger.com/spmf/index.php?link=download.php).
-It is assumed that the SPMF binary `spmf.jar` is located in the `binaries` directory inside `Py-SPMF`. If it is not, either symlink it, or use the `executable_path` parameter.
-
 
 ## Implementation Checklist
 
