@@ -9,7 +9,7 @@ Why? If you're in a Python pipeline, it might be cumbersome to use Java as an in
 ## Installation
 [`pip install spmf-wrapper`](https://pypi.org/project/spmf-wrapper/)
 
-Ensure Java Runtime Environment is also installed. Follow instructions [`here`](https://www.java.com/en/download/help/download_options.html). Test installation by running the following command on the terminal:
+A Java Runtime Environment is required to run this wrapper. If an existing installation is not detected, JRE v21 is automatically installed using `install-jdk` python module at `$HOME/.jre/jdk-21.0.2+13-jre`. If you prefer to install Java Runtime manually, follow instructions [`here`](https://www.java.com/en/download/help/download_options.html). Test installation by running the following command on the terminal:
 
 ```
 > java -version
