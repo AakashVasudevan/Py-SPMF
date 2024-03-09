@@ -5,12 +5,14 @@ http://www.philippe-fournier-viger.com/spmf
 """
 
 import os
+import shutil
 import subprocess
 import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, List, Text
 
+import jdk
 import pandas as pd
 
 
@@ -74,13 +76,13 @@ class Spmf(ABC):
 
         :param input_file_name: Complete path to input txt file to pass to SPMF
         """
-
+        _ = self._install_java_runtime()
         process_arguments = self._create_subprocess_arguments(input_file_name)
 
         try:
             process = subprocess.check_output(process_arguments)
         except subprocess.CalledProcessError as e:
-            raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+            raise RuntimeError(f"command '{e.cmd}' return with error (code {e.returncode}): {e.output}")
 
         if 'java.lang.IllegalArgumentException' in process.decode():
             raise TypeError('java.lang.IllegalArgumentException')
@@ -131,3 +133,20 @@ class Spmf(ABC):
         """
         temp_file.close()
         os.unlink(temp_file.name)
+
+    @staticmethod
+    def _install_java_runtime() -> Text:
+        """ Install Jave Runtime Environment and add to path.
+            No action is performed if an existing Java Runtime is detected.
+
+        :return: Output of shell command "java -version"
+        """
+        if not shutil.which('java'):
+            path = jdk.install(version='21', jre=True)
+            os.environ['JAVA_HOME'] = path
+            os.environ['PATH'] += os.pathsep + os.path.join(path, 'bin')
+
+        try:
+            return subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True).decode('utf-8')
+        except Exception as e:
+            raise RuntimeError(f'An exception of type {type(e).__name__} occurred on running java command.')
