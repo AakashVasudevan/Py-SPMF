@@ -11,6 +11,10 @@ from spmf.base import Spmf
 class Episode(Spmf):
     """ Base class for Episode Mining """
 
+    def _create_subprocess_arguments(self, input_file_name: Text) -> List:
+        """ Create arguments list to pass to subprocess """
+        raise NotImplementedError('This is abstract class. Please call a concrete implementation.')
+
     def _transform_input_dataframe(self, input_df: pd.DataFrame) -> pd.DataFrame:
         """ Transform input dataframe to the format required by SPMF
 
@@ -71,11 +75,7 @@ class Episode(Spmf):
         :return: All words in pattern replaced by the corresponding value in mapping
             NOTE: Original word in pattern is retained if a matching key is not found in mapping
         """
-
-        for p in re.findall(r'\d+', pattern):
-            pattern = pattern.replace(p, mapping.get(p, p))
-
-        return pattern
+        return (' ').join(mapping.get(n, n) for n in re.split(r'\s', pattern))
 
     def _create_output_dataframe(self, patterns: List[Text], supports: List[int]) -> pd.DataFrame:
         """ Create Output Dataframe
@@ -107,6 +107,18 @@ class Episode(Spmf):
 
 class EpisodeRules(Episode):
     """ Base class for Episode Rule Mining """
+
+    @staticmethod
+    def map_pattern(pattern: Text, mapping: Dict[Text, Text]) -> Text:
+        """ Re-map each word in pattern to the corresponding value in the mapping dictionary
+
+        :param pattern: Pattern to map
+        :param mapping: Dictionary with words in input pattern as key and corresponding substitution string as values
+        :return: All words in pattern replaced by the corresponding value in mapping
+            NOTE: Original word in pattern is retained if a matching key is not found in mapping
+        """
+        regex_pattern = re.compile('|'.join(mapping.keys()))
+        return regex_pattern.sub(lambda x: mapping.get(x.group(0), x.group(0)), pattern)
 
     def _parse_output_file(self, **kwargs) -> Tuple[List[Text], List[int], List[float]]:
         """ Parse output txt file created by the Episode Rule Mining algorithm
